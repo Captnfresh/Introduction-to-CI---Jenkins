@@ -118,6 +118,56 @@ image 11
 * Make some changes in any file within your GitHub repository (e.g., README.md) and push the changes to the main branch.
 * You should see that a new build is launched automatically by the webhook, and you can see the results stored on the Jenkins server.
 
+  image 14
+
+## CONGRATULATIONS!!!! 
+
+## We have now configured an automated Jenkins job that receives files from GitHub by webhook trigger (this method is considered as 'push' because the changes are being 'pushed' and files transfer is initiated by GitHub). There are also other methods: trigger one job (downstreadm) from another (upstream), poll GitHub periodically and others.  
+
+
+By default, Jenkins stores the build artifacts locally on the Jenkins server.
+
+```
+ls /var/lib/jenkins/jobs/tooling_github/builds/<build_number>/archive/
+```
+image 15
+
+
+## Step 3 - Configure Jenkins to copy files to NFS server via SSH
+
+Now we have our artifacts saved locally on Jenkins server, the next step is to copy them to our NFS server to /mnt/apps directory. Jenkins is a highly extendable application and there are 1400+ plugins available. We will need a plugin that is called "Publish Over SSH".
+
+1. Install "Publish Over SSH" plugin.
+On main dashboard select "Manage Jenkins" and choose "Manage Plugins" menu item. On "Available" tab search for "Publish Over SSH" plugin and install it.
+
+2. Configure the job/project to copy artifacts over to NFS server.
+On main dashboard select "Manage Jenkins" and choose "Configure System" menu item. Scroll down to Publish over SSH plugin configuration section and configure it to be able to connect to our NFS server. Provide a private key (content of .pem file that you use to connect to NFS server via SSH/Putty)
+
+3. Paste the private here:
+   * Arbitrary name
+   
+   * Hostname - can be private IP address of your NFS server.
+   
+   * Username - ec2-user (since NFS server is based on EC2 with RHEL 8).
+   
+   * Remote directory - /mnt/apps since our Web Servers use it as a mointing point to retrieve files from the NFS server
+
+4. Test the configuration and make sure the connection returns Success. Remember, that TCP port 22 on NFS server must be open to receive SSH connections. Save the configuration, open Jenkins job/project configuration page and add another one "Post-build Action"
+
+5. Configure it to send all files probuced by the build into our previouslys define remote directory. In our case we want to copy all files and directories - so we use **. If you want to apply some particular pattern to define which files to send - use this syntax.
+
+Save this configuration and go ahead, change something in README.MD file in your GitHub Tooling repository.
+
+Webhook will trigger a new job and in the "Console Output" of the job you will find something like this:
+
+image 16
+
+# Conclusion:
+
+### This project demonstrates the successful implementation of a Continuous Integration and Continuous Deployment (CI/CD) pipeline for a tooling website using Jenkins. By automating the deployment process, we have significantly improved the efficiency and reliability of our software delivery workflow.
+
+### Key achievements of this project include: Setting up a Jenkins server to orchestrate the CI/CD pipeline. Integrating version control (Git) with Jenkins for automated builds and deployments. Implementing automated testing to ensure code quality and reduce the risk of bugs in production. Configuring Jenkins to deploy the tooling website to a production environment automatically. Demonstrating the benefits of CI/CD practices in terms of faster release cycles and improved collaboration among team members. This project serves as an excellent introduction to Jenkins and CI/CD concepts, providing a solid foundation for further exploration of advanced DevOps practices. By adopting these automation techniques, we have taken a significant step towards more efficient and reliable software development and deployment processes.
+
 
 
   
